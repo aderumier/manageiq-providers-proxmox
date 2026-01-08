@@ -1,0 +1,204 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://proxmox:8006/api2/json/access/ticket
+    body:
+      encoding: UTF-8
+      string: password=PROXMOX_PASSWORD&username=PROXMOX_USERNAME%40pam
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - Keep-Alive
+      - close
+      Date:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - pve-api-daemon/3.0
+      Content-Length:
+      - '1619'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"data":{"cap":{"storage":{"Datastore.Allocate":1,"Permissions.Modify":1,"Datastore.AllocateSpace":1,"Datastore.Audit":1,"Datastore.AllocateTemplate":1},"access":{"Group.Allocate":1,"User.Modify":1,"Permissions.Modify":1},"dc":{"Sys.Audit":1,"Sys.Modify":1,"SDN.Audit":1,"SDN.Allocate":1,"SDN.Use":1},"mapping":{"Mapping.Use":1,"Permissions.Modify":1,"Mapping.Modify":1,"Mapping.Audit":1},"nodes":{"Sys.Audit":1,"Sys.AccessNetwork":1,"Sys.PowerMgmt":1,"Sys.Console":1,"Sys.Syslog":1,"Sys.Modify":1,"Sys.Incoming":1,"Permissions.Modify":1},"vms":{"VM.Config.CDROM":1,"VM.Config.Network":1,"VM.Config.Memory":1,"VM.Migrate":1,"VM.Clone":1,"VM.Config.Cloudinit":1,"VM.Config.Options":1,"VM.PowerMgmt":1,"VM.GuestAgent.Unrestricted":1,"VM.Config.CPU":1,"VM.Replicate":1,"Permissions.Modify":1,"VM.Snapshot":1,"VM.Backup":1,"VM.Console":1,"VM.Allocate":1,"VM.GuestAgent.Audit":1,"VM.Config.HWType":1,"VM.GuestAgent.FileRead":1,"VM.Audit":1,"VM.GuestAgent.FileSystemMgmt":1,"VM.GuestAgent.FileWrite":1,"VM.Config.Disk":1,"VM.Snapshot.Rollback":1},"sdn":{"SDN.Audit":1,"SDN.Allocate":1,"Permissions.Modify":1,"SDN.Use":1}},"ticket":"PVE:PROXMOX_USERNAME@pam:69615C17::vz/6GPfFUsCsjn3eBePIMmK9lRBvww89057nhkFhUcTr33uv7CMOSwMx7KDjYnDFi3Q6p2T8LuHQnZLiMEDiwos3D8DzBptfLvrI9+tD2Z4MB6gORdOhOJh2/DoPIBEUeEZvMAyAGIQdRf360NBxZxjoDmpoQFq5GeWJCYjB5xNCyERcxGSO9C/pny9WEHe+s/fsDTvEOrZniWNCtaVAZaGkbziaX7F7d1X7NIh2fpl0CUwc0atbUuTidoi1ScPA+zQZ3qVC4yxKz4xzsEpkDr661yrr8ZjR3QLouRyy2r3MzVp128XgopmyCK+SGe0xObCOAMq1E7g73hoRbPar5w==","clustername":"Cluster","username":"PROXMOX_USERNAME@pam","CSRFPreventionToken":"69615C17:osuRNAf/QTT3gniA4YJ272BxZK759L9HwO5yX/SZU8Y"}}'
+  recorded_at: Fri, 09 Jan 2026 19:50:47 GMT
+- request:
+    method: get
+    uri: https://proxmox:8006/api2/json/cluster/resources
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Cookie:
+      - PVEAuthCookie=PVE:PROXMOX_USERNAME@pam:69615C17::vz/6GPfFUsCsjn3eBePIMmK9lRBvww89057nhkFhUcTr33uv7CMOSwMx7KDjYnDFi3Q6p2T8LuHQnZLiMEDiwos3D8DzBptfLvrI9+tD2Z4MB6gORdOhOJh2/DoPIBEUeEZvMAyAGIQdRf360NBxZxjoDmpoQFq5GeWJCYjB5xNCyERcxGSO9C/pny9WEHe+s/fsDTvEOrZniWNCtaVAZaGkbziaX7F7d1X7NIh2fpl0CUwc0atbUuTidoi1ScPA+zQZ3qVC4yxKz4xzsEpkDr661yrr8ZjR3QLouRyy2r3MzVp128XgopmyCK+SGe0xObCOAMq1E7g73hoRbPar5w==
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - Keep-Alive
+      Date:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - pve-api-daemon/3.0
+      Content-Length:
+      - '1055'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"data":[{"memhost":39797760,"maxcpu":1,"diskwrite":0,"type":"qemu","status":"running","netout":888408,"diskread":331776,"node":"pve","maxmem":2147483648,"vmid":100,"cpu":0.343421661117646,"template":0,"netin":1022872,"id":"qemu/100","uptime":8660,"maxdisk":34359738368,"disk":0,"mem":39797760,"name":"vm-test"},{"cpu":0.192592592592593,"uptime":9576,"id":"node/pve","mem":1631977472,"disk":4095176704,"maxdisk":9183899648,"maxcpu":2,"status":"online","type":"node","level":"","cgroup-mode":2,"node":"pve","maxmem":2062860288},{"content":"images,PROXMOX_USERNAMEdir","disk":0,"node":"pve","maxdisk":7281311744,"shared":0,"plugintype":"lvmthin","id":"storage/pve/local-lvm","storage":"local-lvm","type":"storage","status":"available"},{"storage":"local","status":"available","type":"storage","shared":0,"id":"storage/pve/local","plugintype":"dir","disk":4095176704,"node":"pve","maxdisk":9183899648,"content":"backup,import,iso,vztmpl"},{"network-type":"zone","node":"pve","network":"localnetwork","type":"network","status":"ok","id":"network/pve/zone/localnetwork"}]}'
+  recorded_at: Fri, 09 Jan 2026 19:50:47 GMT
+- request:
+    method: get
+    uri: https://proxmox:8006/api2/json/cluster/resources
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Cookie:
+      - PVEAuthCookie=PVE:PROXMOX_USERNAME@pam:69615C17::vz/6GPfFUsCsjn3eBePIMmK9lRBvww89057nhkFhUcTr33uv7CMOSwMx7KDjYnDFi3Q6p2T8LuHQnZLiMEDiwos3D8DzBptfLvrI9+tD2Z4MB6gORdOhOJh2/DoPIBEUeEZvMAyAGIQdRf360NBxZxjoDmpoQFq5GeWJCYjB5xNCyERcxGSO9C/pny9WEHe+s/fsDTvEOrZniWNCtaVAZaGkbziaX7F7d1X7NIh2fpl0CUwc0atbUuTidoi1ScPA+zQZ3qVC4yxKz4xzsEpkDr661yrr8ZjR3QLouRyy2r3MzVp128XgopmyCK+SGe0xObCOAMq1E7g73hoRbPar5w==
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - Keep-Alive
+      Date:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - pve-api-daemon/3.0
+      Content-Length:
+      - '1055'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"data":[{"vmid":100,"maxmem":2147483648,"node":"pve","diskread":331776,"status":"running","type":"qemu","netout":888408,"maxcpu":1,"memhost":39797760,"diskwrite":0,"name":"vm-test","disk":0,"maxdisk":34359738368,"mem":39797760,"netin":1022872,"template":0,"uptime":8660,"id":"qemu/100","cpu":0.343421661117646},{"cpu":0.192592592592593,"id":"node/pve","uptime":9576,"maxdisk":9183899648,"disk":4095176704,"mem":1631977472,"maxcpu":2,"status":"online","type":"node","node":"pve","level":"","cgroup-mode":2,"maxmem":2062860288},{"storage":"local-lvm","type":"storage","status":"available","shared":0,"plugintype":"lvmthin","id":"storage/pve/local-lvm","disk":0,"node":"pve","maxdisk":7281311744,"content":"PROXMOX_USERNAMEdir,images"},{"storage":"local","type":"storage","status":"available","shared":0,"plugintype":"dir","id":"storage/pve/local","disk":4095176704,"node":"pve","maxdisk":9183899648,"content":"iso,vztmpl,backup,import"},{"type":"network","status":"ok","id":"network/pve/zone/localnetwork","network":"localnetwork","network-type":"zone","node":"pve"}]}'
+  recorded_at: Fri, 09 Jan 2026 19:50:47 GMT
+- request:
+    method: get
+    uri: https://proxmox:8006/api2/json/cluster/resources
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Cookie:
+      - PVEAuthCookie=PVE:PROXMOX_USERNAME@pam:69615C17::vz/6GPfFUsCsjn3eBePIMmK9lRBvww89057nhkFhUcTr33uv7CMOSwMx7KDjYnDFi3Q6p2T8LuHQnZLiMEDiwos3D8DzBptfLvrI9+tD2Z4MB6gORdOhOJh2/DoPIBEUeEZvMAyAGIQdRf360NBxZxjoDmpoQFq5GeWJCYjB5xNCyERcxGSO9C/pny9WEHe+s/fsDTvEOrZniWNCtaVAZaGkbziaX7F7d1X7NIh2fpl0CUwc0atbUuTidoi1ScPA+zQZ3qVC4yxKz4xzsEpkDr661yrr8ZjR3QLouRyy2r3MzVp128XgopmyCK+SGe0xObCOAMq1E7g73hoRbPar5w==
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - Keep-Alive
+      Date:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - pve-api-daemon/3.0
+      Content-Length:
+      - '1055'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"data":[{"node":"pve","diskread":331776,"vmid":100,"maxmem":2147483648,"maxcpu":1,"memhost":39797760,"diskwrite":0,"type":"qemu","status":"running","netout":888408,"disk":0,"maxdisk":34359738368,"mem":39797760,"name":"vm-test","cpu":0.343421661117646,"netin":1022872,"template":0,"uptime":8660,"id":"qemu/100"},{"disk":4095176704,"maxdisk":9183899648,"mem":1631977472,"uptime":9576,"id":"node/pve","cpu":0.192592592592593,"maxmem":2062860288,"node":"pve","cgroup-mode":2,"level":"","status":"online","type":"node","maxcpu":2},{"maxdisk":7281311744,"disk":0,"node":"pve","content":"images,PROXMOX_USERNAMEdir","type":"storage","status":"available","storage":"local-lvm","id":"storage/pve/local-lvm","plugintype":"lvmthin","shared":0},{"storage":"local","status":"available","type":"storage","shared":0,"plugintype":"dir","id":"storage/pve/local","node":"pve","disk":4095176704,"maxdisk":9183899648,"content":"iso,vztmpl,import,backup"},{"node":"pve","network":"localnetwork","network-type":"zone","id":"network/pve/zone/localnetwork","status":"ok","type":"network"}]}'
+  recorded_at: Fri, 09 Jan 2026 19:50:47 GMT
+- request:
+    method: get
+    uri: https://proxmox:8006/api2/json/cluster/resources
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Cookie:
+      - PVEAuthCookie=PVE:PROXMOX_USERNAME@pam:69615C17::vz/6GPfFUsCsjn3eBePIMmK9lRBvww89057nhkFhUcTr33uv7CMOSwMx7KDjYnDFi3Q6p2T8LuHQnZLiMEDiwos3D8DzBptfLvrI9+tD2Z4MB6gORdOhOJh2/DoPIBEUeEZvMAyAGIQdRf360NBxZxjoDmpoQFq5GeWJCYjB5xNCyERcxGSO9C/pny9WEHe+s/fsDTvEOrZniWNCtaVAZaGkbziaX7F7d1X7NIh2fpl0CUwc0atbUuTidoi1ScPA+zQZ3qVC4yxKz4xzsEpkDr661yrr8ZjR3QLouRyy2r3MzVp128XgopmyCK+SGe0xObCOAMq1E7g73hoRbPar5w==
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0
+      Connection:
+      - Keep-Alive
+      Date:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+      Pragma:
+      - no-cache
+      Server:
+      - pve-api-daemon/3.0
+      Content-Length:
+      - '1055'
+      Content-Type:
+      - application/json;charset=UTF-8
+      Expires:
+      - Fri, 09 Jan 2026 19:50:47 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"data":[{"maxdisk":34359738368,"disk":0,"mem":39797760,"name":"vm-test","cpu":0.343421661117646,"template":0,"netin":1022872,"id":"qemu/100","uptime":8660,"diskread":331776,"node":"pve","maxmem":2147483648,"vmid":100,"memhost":39797760,"maxcpu":1,"diskwrite":0,"status":"running","type":"qemu","netout":888408},{"maxcpu":2,"type":"node","status":"online","node":"pve","level":"","cgroup-mode":2,"maxmem":2062860288,"cpu":0.192592592592593,"uptime":9576,"id":"node/pve","disk":4095176704,"maxdisk":9183899648,"mem":1631977472},{"id":"storage/pve/local","plugintype":"dir","shared":0,"type":"storage","status":"available","storage":"local","content":"backup,import,iso,vztmpl","maxdisk":9183899648,"node":"pve","disk":4095176704},{"plugintype":"lvmthin","id":"storage/pve/local-lvm","shared":0,"type":"storage","status":"available","storage":"local-lvm","content":"images,PROXMOX_USERNAMEdir","maxdisk":7281311744,"node":"pve","disk":0},{"network-type":"zone","network":"localnetwork","node":"pve","id":"network/pve/zone/localnetwork","status":"ok","type":"network"}]}'
+  recorded_at: Fri, 09 Jan 2026 19:50:47 GMT
+recorded_with: VCR 6.4.0
