@@ -107,13 +107,12 @@ module ManageIQ::Providers
       _log.info("  - hostname: #{hostname}")
       _log.info("  - port: #{port}")
       _log.info("  - userid: #{userid}")
-      _log.info("  - password (raw): #{password[0..20]}...") if password
 
-      # IMPORTANT: Décrypter le mot de passe si nécessaire
+      # Décrypter le mot de passe si nécessaire
       if password && password.start_with?("v2:")
         _log.info("Password is encrypted, decrypting...")
         password = ManageIQ::Password.decrypt(password)
-        _log.info("Password decrypted successfully, length: #{password&.length || 0}")
+        _log.info("Password decrypted successfully")
       end
 
       unless userid&.include?("@")
@@ -135,7 +134,6 @@ module ManageIQ::Providers
       raise
     end
 
-    # Méthode pour créer un client Proxmox
     def connect(options = {})
       raise MiqException::MiqHostError, _("No credentials defined") if missing_credentials?(options[:auth_type])
 
@@ -166,7 +164,6 @@ module ManageIQ::Providers
       _log.info("=== PROXMOX raw_connect ===")
       _log.info("Connecting to: https://#{hostname}:#{port}")
       _log.info("Username: #{username}")
-      _log.info("Password length: #{password&.length || 0}")
       _log.info("Verify SSL: #{verify_ssl}")
 
       require 'rest-client'
@@ -227,7 +224,7 @@ module ManageIQ::Providers
             _("Unable to connect: %{error}") % {:error => err.message}
     end
 
-    # Classe client simple pour Proxmox
+    # Classe client Proxmox
     class ProxmoxClient
       attr_reader :url, :ticket, :csrf_token, :verify_ssl
 
@@ -242,20 +239,71 @@ module ManageIQ::Providers
         require 'rest-client'
         require 'json'
 
+        # Enlever le slash initial si présent
+        path = path.sub(/^\//, '')
+
         response = RestClient::Request.execute(
           method: :get,
-          url: "#{@url}#{path}",
+          url: "#{@url}/#{path}",
           headers: {
             'Cookie' => "PVEAuthCookie=#{@ticket}"
           },
-          verify_ssl: @verify_ssl
+          verify_ssl: @verify_ssl,
+          timeout: 60
         )
 
-        JSON.parse(response.body)['data']
+        result = JSON.parse(response.body)
+        result['data']
+      rescue RestClient::Exception => err
+        ManageIQ::Providers::Proxmox::InfraManager._log.error("API call failed for #{path}: #{err.message}")
+        raise
+      end
+
+      def post(path, payload = {})
+        require 'rest-client'
+        require 'json'
+
+        path = path.sub(/^\//, '')
+
+        response = RestClient::Request.execute(
+          method: :post,
+          url: "#{@url}/#{path}",
+          payload: payload,
+          headers: {
+            'Cookie' => "PVEAuthCookie=#{@ticket}",
+            'CSRFPreventionToken' => @csrf_token
+          },
+          verify_ssl: @verify_ssl,
+          timeout: 60
+        )
+
+        result = JSON.parse(response.body)
+        result['data']
+      rescue RestClient::Exception => err
+        ManageIQ::Providers::Proxmox::InfraManager._log.error("API POST failed for #{path}: #{err.message}")
+        raise
       end
 
       def nodes
         @nodes ||= NodesCollection.new(self)
+      end
+
+      def cluster
+        @cluster ||= ClusterCollection.new(self)
+      end
+
+      class ClusterCollection
+        def initialize(client)
+          @client = client
+        end
+
+        def resources
+          @client.get('cluster/resources')
+        end
+
+        def status
+          @client.get('cluster/status')
+        end
       end
 
       class NodesCollection
@@ -264,7 +312,7 @@ module ManageIQ::Providers
         end
 
         def all
-          @client.get('/nodes')
+          @client.get('nodes')
         end
 
         def get(node_name)
@@ -281,6 +329,18 @@ module ManageIQ::Providers
         def qemu
           QemuCollection.new(@client, @name)
         end
+
+        def lxc
+          LxcCollection.new(@client, @name)
+        end
+
+        def storage
+          @client.get("nodes/#{@name}/storage")
+        end
+
+        def network
+          @client.get("nodes/#{@name}/network")
+        end
       end
 
       class QemuCollection
@@ -290,13 +350,28 @@ module ManageIQ::Providers
         end
 
         def all
-          @client.get("/nodes/#{@node_name}/qemu")
+          @client.get("nodes/#{@node_name}/qemu")
+        end
+
+        def get(vmid)
+          @client.get("nodes/#{@node_name}/qemu/#{vmid}/config")
+        end
+      end
+
+      class LxcCollection
+        def initialize(client, node_name)
+          @client = client
+          @node_name = node_name
+        end
+
+        def all
+          @client.get("nodes/#{@node_name}/lxc")
+        end
+
+        def get(vmid)
+          @client.get("nodes/#{@node_name}/lxc/#{vmid}/config")
         end
       end
     end
   end
 end
-
-require_dependency 'manageiq/providers/proxmox/infra_manager/host'
-require_dependency 'manageiq/providers/proxmox/infra_manager/vm'
-require_dependency 'manageiq/providers/proxmox/infra_manager/refresher'
