@@ -7,6 +7,17 @@ class ManageIQ::Providers::Proxmox::InfraManager::Vm < ManageIQ::Providers::Infr
   supports :stop
   supports :shutdown_guest
 
+  POWER_STATES = {
+    'running'   => 'on',
+    'stopped'   => 'off',
+    'paused'    => 'paused',
+    'suspended' => 'suspended'
+  }.freeze
+
+  def self.calculate_power_state(raw_power_state)
+    POWER_STATES[raw_power_state] || super
+  end
+
   def raw_start
     with_provider_connection do |connection|
       connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/start")

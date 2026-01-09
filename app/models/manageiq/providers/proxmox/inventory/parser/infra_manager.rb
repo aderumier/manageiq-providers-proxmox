@@ -51,13 +51,7 @@ class ManageIQ::Providers::Proxmox::Inventory::Parser::InfraManager < ManageIQ::
       puts "  - VM: #{vm_data['name']} (#{vm_data['vmid']})"
 
       # Calculer le power_state à partir du statut Proxmox
-      raw_state = vm_data['status'].to_s.downcase
-      power_state = case raw_state
-                    when 'running' then 'on'
-                    when 'stopped' then 'off'
-                    when 'paused', 'suspended' then 'suspended'
-                    else 'unknown'
-                    end
+	#      raw_state = vm_data['status'].to_s.downcase
 
       # Créer le hash d'attributs
       vm_attributes = {
@@ -65,8 +59,7 @@ class ManageIQ::Providers::Proxmox::Inventory::Parser::InfraManager < ManageIQ::
         :uid_ems          => vm_data['vmid'].to_s,
         :name             => vm_data['name'] || "VM-#{vm_data['vmid']}",
         :vendor           => 'unknown',
-        :raw_power_state  => raw_state,
-        :power_state      => power_state,
+        :raw_power_state  => vm_data['status'].to_s.downcase,
         :connection_state => 'connected',
         :location         => "#{vm_data['node']}/#{vm_data['vmid']}",
         :host             => persister.hosts.lazy_find(vm_data['node']),
