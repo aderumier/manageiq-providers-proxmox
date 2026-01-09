@@ -43,31 +43,50 @@ class ManageIQ::Providers::Proxmox::Inventory::Parser::InfraManager < ManageIQ::
         )
       end
     end
+    
 
-    def vms
-      puts "Parsing #{collector.vms.size} VMs..."
-      collector.vms.each do |vm_data|
-        puts "  - VM: #{vm_data['name']} (#{vm_data['vmid']})"
-        vm = persister.vms.build(
-          :ems_ref          => vm_data['vmid'].to_s,
-          :uid_ems          => vm_data['vmid'].to_s,
-          :name             => vm_data['name'] || "VM-#{vm_data['vmid']}",
-          :vendor           => 'unknown',
-          :raw_power_state  => vm_data['status'],
-          :connection_state => 'connected',
-          :location         => "#{vm_data['node']}/#{vm_data['vmid']}",
-          :host             => persister.hosts.lazy_find(vm_data['node']),
-          :ems_cluster      => persister.clusters.lazy_find('default'),
-          :template         => vm_data['template'] == 1
-        )
+  def vms
+    puts "Parsing #{collector.vms.size} VMs..."
+    collector.vms.each do |vm_data|
+      puts "  - VM: #{vm_data['name']} (#{vm_data['vmid']})"
 
-        persister.hardwares.build(
-          :vm_or_template   => vm,
-          :cpu_total_cores  => vm_data['maxcpu'] || 1,
-          :memory_mb        => vm_data['maxmem'] ? (vm_data['maxmem'] / 1.megabyte).to_i : nil
-        )
-      end
+      # Calculer le power_state à partir du statut Proxmox
+      raw_state = vm_data['status'].to_s.downcase
+      power_state = case raw_state
+                    when 'running' then 'on'
+                    when 'stopped' then 'off'
+                    when 'paused', 'suspended' then 'suspended'
+                    else 'unknown'
+                    end
+
+      # Créer le hash d'attributs
+      vm_attributes = {
+        :ems_ref          => vm_data['vmid'].to_s,
+        :uid_ems          => vm_data['vmid'].to_s,
+        :name             => vm_data['name'] || "VM-#{vm_data['vmid']}",
+        :vendor           => 'unknown',
+        :raw_power_state  => raw_state,
+        :power_state      => power_state,
+        :connection_state => 'connected',
+        :location         => "#{vm_data['node']}/#{vm_data['vmid']}",
+        :host             => persister.hosts.lazy_find(vm_data['node']),
+        :ems_cluster      => persister.clusters.lazy_find('default'),
+        :template         => vm_data['template'] == 1
+      }
+
+      # --- LIGNE DE DÉBOGAGE ---
+      puts "--- DEBUG VM HASH: #{vm_attributes.inspect}"
+      # --- FIN DE LA LIGNE DE DÉBOGAGE ---
+
+      vm = persister.vms.build(vm_attributes)
+
+      persister.hardwares.build(
+        :vm_or_template   => vm,
+        :cpu_total_cores  => vm_data['maxcpu'] || 1,
+        :memory_mb        => vm_data['maxmem'] ? (vm_data['maxmem'] / 1.megabyte).to_i : nil
+      )
     end
+  end
 
     def storages
       puts "Parsing #{collector.storages.size} storages..."

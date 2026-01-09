@@ -4,58 +4,46 @@ class ManageIQ::Providers::Proxmox::InfraManager::Vm < ManageIQ::Providers::Infr
   supports :reset
   supports :suspend
   supports :start
-  
-  def provider_object(connection = nil)
-    connection ||= ext_management_system.connect
-    connection.get("nodes/#{host.name}/qemu/#{ems_ref}/status/current")
-  end
+  supports :stop
+  supports :shutdown_guest
 
   def raw_start
     with_provider_connection do |connection|
-      connection.post("nodes/#{host.name}/qemu/#{ems_ref}/status/start")
+      connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/start")
     end
-    self.update!(:raw_power_state => "running")
+    self.update!(:raw_power_state => 'running')
   end
 
   def raw_stop
     with_provider_connection do |connection|
-      connection.post("nodes/#{host.name}/qemu/#{ems_ref}/status/stop")
+      connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/stop")
     end
-    self.update!(:raw_power_state => "stopped")
+    self.update!(:raw_power_state => 'stopped')
   end
 
   def raw_suspend
     with_provider_connection do |connection|
-      connection.post("nodes/#{host.name}/qemu/#{ems_ref}/status/suspend")
+      connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/suspend")
     end
-    self.update!(:raw_power_state => "suspended")
+    self.update!(:raw_power_state => 'paused')
   end
 
   def raw_reboot_guest
     with_provider_connection do |connection|
-      connection.post("nodes/#{host.name}/qemu/#{ems_ref}/status/reboot")
+      connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/reboot")
     end
   end
 
   def raw_reset
     with_provider_connection do |connection|
-      connection.post("nodes/#{host.name}/qemu/#{ems_ref}/status/reset")
+      connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/reset")
     end
   end
 
-  def raw_destroy
+  def raw_shutdown_guest
     with_provider_connection do |connection|
-      connection.delete("nodes/#{host.name}/qemu/#{ems_ref}")
+      connection.post("/nodes/#{host.ems_ref}/qemu/#{ems_ref}/status/shutdown")
     end
-    self.update!(:raw_power_state => "terminated")
-  end
-
-  private
-
-  def with_provider_connection(&block)
-    connection = ext_management_system.connect
-    yield connection
-  ensure
-    connection&.logout if connection.respond_to?(:logout)
+    self.update!(:raw_power_state => 'stopped')
   end
 end
