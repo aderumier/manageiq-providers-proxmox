@@ -320,6 +320,30 @@ module ManageIQ::Providers
         raise
       end
 
+      def delete(path)
+        require 'rest-client'
+        require 'json'
+
+        path = path.sub(/^\//, '')
+
+        response = RestClient::Request.execute(
+          method: :delete,
+          url: "#{@url}/#{path}",
+          headers: {
+            'Cookie' => "PVEAuthCookie=#{@ticket}",
+            'CSRFPreventionToken' => @csrf_token
+          },
+          verify_ssl: @verify_ssl,
+          timeout: 60
+        )
+
+        result = JSON.parse(response.body)
+        result['data']
+      rescue RestClient::Exception => err
+        ManageIQ::Providers::Proxmox::InfraManager._log.error("API DELETE failed for #{path}: #{err.message}")
+        raise
+      end
+
       def nodes
         @nodes ||= NodesCollection.new(self)
       end
@@ -340,6 +364,29 @@ module ManageIQ::Providers
 
         def status
           @client.get('cluster/status')
+        end
+
+        def wait_for_task(upid, timeout = 300)
+          return unless upid
+          
+          start_time = Time.now
+          
+          while (Time.now - start_time) < timeout
+            task_data = @client.get("cluster/tasks/#{upid}")
+            
+            # get returns result['data'], which may be an array or a hash
+            task_data = task_data.first if task_data.is_a?(Array)
+            
+            return unless task_data
+            
+            status = task_data['status']
+            return if status == 'stopped' # Completed
+            raise _("Task failed: %{exitstatus}") % {:exitstatus => task_data['exitstatus']} if status == 'failed'
+            
+            sleep(2) # Poll every 2 seconds
+          end
+          
+          raise _("Task timeout after %{timeout} seconds") % {:timeout => timeout}
         end
       end
 

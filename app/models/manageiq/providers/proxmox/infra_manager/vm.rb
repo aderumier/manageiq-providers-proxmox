@@ -1,4 +1,6 @@
 class ManageIQ::Providers::Proxmox::InfraManager::Vm < ManageIQ::Providers::InfraManager::Vm
+  include_concern "Operations"
+
   supports :terminate
   supports :reboot_guest
   supports :reset
