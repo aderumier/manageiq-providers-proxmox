@@ -334,7 +334,8 @@ module ManageIQ::Providers
         end
 
         def resources
-          @client.get('cluster/resources')
+          # Get all cluster resources
+          @client.get('cluster/resources') || []
         end
 
         def status
