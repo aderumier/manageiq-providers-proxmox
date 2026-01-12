@@ -366,16 +366,26 @@ module ManageIQ::Providers
           @client.get('cluster/status')
         end
 
+        def get_task_status(upid)
+          # Get task status from cluster tasks without waiting
+          task_data = @client.get("cluster/tasks/#{upid}")
+          
+          # Handle both array and hash response
+          task_data = task_data.first if task_data.is_a?(Array)
+          
+          task_data
+        rescue => err
+          ManageIQ::Providers::Proxmox::InfraManager._log.debug("Failed to get task status for #{upid}: #{err.message}")
+          nil
+        end
+
         def wait_for_task(upid, timeout = 300)
           return unless upid
           
           start_time = Time.now
           
           while (Time.now - start_time) < timeout
-            task_data = @client.get("cluster/tasks/#{upid}")
-            
-            # get returns result['data'], which may be an array or a hash
-            task_data = task_data.first if task_data.is_a?(Array)
+            task_data = get_task_status(upid)
             
             return unless task_data
             
