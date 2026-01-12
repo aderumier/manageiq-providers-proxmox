@@ -61,7 +61,7 @@ class ManageIQ::Providers::Proxmox::Inventory::Parser::InfraManager < ManageIQ::
         :vendor           => 'unknown',
         :raw_power_state  => vm_data['status'].to_s.downcase,
         :connection_state => 'connected',
-        :location         => "#{vm_data['node']}/#{vm_data['vmid']}",
+        :location         => "#{vm_data['node']}/#{vm_data['type']}/#{vm_data['vmid']}",
         :host             => persister.hosts.lazy_find(vm_data['node']),
         :ems_cluster      => persister.clusters.lazy_find('default'),
         :template         => vm_data['template'] == 1
