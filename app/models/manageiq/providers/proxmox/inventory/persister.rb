@@ -8,5 +8,6 @@ class ManageIQ::Providers::Proxmox::Inventory::Persister < ManageIQ::Providers::
     add_collection(infra, :hardwares)
     add_collection(infra, :storages)
     add_collection(infra, :vms)
+    add_collection(infra, :snapshots)
   end
 end

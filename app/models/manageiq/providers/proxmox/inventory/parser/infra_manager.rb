@@ -78,6 +78,67 @@ class ManageIQ::Providers::Proxmox::Inventory::Parser::InfraManager < ManageIQ::
         :cpu_total_cores  => vm_data['maxcpu'] || 1,
         :memory_mb        => vm_data['maxmem'] ? (vm_data['maxmem'] / 1.megabyte).to_i : nil
       )
+
+      # Parse snapshots for this VM
+      location = "#{vm_data['node']}/#{vm_data['type']}/#{vm_data['vmid']}"
+      snapshots(vm, vm_data, location)
+    end
+  end
+
+  def snapshots(persister_vm, vm_data, location)
+    return if vm_data['template'] == 1 # Templates don't have snapshots
+    
+    snapshots_list = collector.snapshots_for_vm(location)
+    return if snapshots_list.blank?
+    
+    # Proxmox snapshots have parent references, we need to build a tree
+    # We'll use the snapshot name as uid_ems since it's unique per VM
+    
+    # Build a map of snapshot names to snapshot data for parent lookup
+    snapshots_map = {}
+    snapshots_list.each do |snapshot|
+      snap_name = snapshot['name']
+      snapshots_map[snap_name] = snapshot
+    end
+    
+    # Check if snapshots are empty (only "current" snapshot without parent)
+    current_snapshot = snapshots_map['current']
+    if snapshots_list.size == 1 && current_snapshot && current_snapshot['parent'].blank?
+      return # No real snapshots, only the current state marker
+    end
+    
+    # Find the "current" snapshot and determine which snapshot is current
+    # The parent of "current" is the active snapshot (current=true)
+    current_snapshot_name = nil
+    if current_snapshot && current_snapshot['parent']
+      current_snapshot_name = current_snapshot['parent']
+    end
+    
+    # Build parent relationships
+    snapshots_list.each do |snapshot|
+      snap_name = snapshot['name']
+      next if snap_name == 'current' # Skip 'current' snapshot (it's not a real snapshot)
+      
+      parent_name = snapshot['parent']
+      
+      # Use parent name as parent_uid
+      parent_uid = parent_name
+      
+      # Mark snapshot as current if it's the parent of "current" snapshot
+      is_current = (snap_name == current_snapshot_name)
+      
+      persister.snapshots.find_or_build(:uid => snap_name).assign_attributes(
+        :uid_ems        => snap_name,
+        :uid            => snap_name,
+        :parent_uid     => parent_uid,
+        :parent         => parent_uid ? persister.snapshots.lazy_find(parent_uid) : nil,
+        :name           => snapshot['name'] || '',
+        :description    => snapshot['description'] || '',
+        :create_time    => Time.at(snapshot['snaptime'].to_i).utc,
+        :current        => is_current,
+        :vm_or_template => persister_vm,
+        :total_size     => snapshot['size'] || 0
+      )
     end
   end
 

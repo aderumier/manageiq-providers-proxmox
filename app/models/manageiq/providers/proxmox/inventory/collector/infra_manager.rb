@@ -51,4 +51,20 @@ class ManageIQ::Providers::Proxmox::Inventory::Collector::InfraManager < ManageI
       result
     end
   end
+
+  def snapshots_for_vm(location)
+    @snapshots_cache ||= {}
+    
+    return @snapshots_cache[location] if @snapshots_cache.key?(location)
+    
+    @snapshots_cache[location] = begin
+      snapshots = connection.get("nodes/#{location}/snapshot") || []
+      # Handle both array and hash response
+      snapshots = snapshots['data'] if snapshots.is_a?(Hash) && snapshots.key?('data')
+      snapshots.is_a?(Array) ? snapshots : []
+    rescue => err
+      _log.debug("Failed to fetch snapshots for VM at location #{location}: #{err.message}")
+      []
+    end
+  end
 end
